@@ -1,0 +1,5 @@
+Flask
+Flask-Cors
+web3
+eth-account
+objsize

@@ -9,7 +9,7 @@ def random_txs(n: int) -> List[TX]:
 
 
 class MerkleTree:
-    def __init__(self, txs: Sequence[TX]):
+    def __init__(self, txs: Sequence[TX]) -> None:
         self.mt: Dict[str, List[Hash]] = {}
         leafs: List[Hash] = [tx.hash for tx in txs]
         if len(leafs) % 2 != 0:

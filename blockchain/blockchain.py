@@ -2,7 +2,7 @@ from mine import *
 
 
 class AccountState:
-    def __init__(self):
+    def __init__(self) -> None:
         self.balance: float = 0
         self.nonce: int = 0
 
@@ -23,7 +23,7 @@ class AccountState:
 
 
 class State:
-    def __init__(self):
+    def __init__(self) -> None:
         self.state: Dict[Hash, AccountState] = {}
 
     def new(self, pub: Hash) -> None:
@@ -72,7 +72,7 @@ class State:
 
 
 class Blockchain:
-    def __init__(self, gb: Block):
+    def __init__(self, gb: Block) -> None:
         self.state: State = State()
         self.blocks: List[Block] = []
         self.state.init(gb)

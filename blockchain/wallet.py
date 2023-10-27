@@ -16,7 +16,7 @@ def keys() -> Tuple[str, Hash]:
 
 
 class Wallet:
-    def __init__(self):
+    def __init__(self) -> None:
         self.priv, self.pub = keys()
         self.nonce: int = 0
 

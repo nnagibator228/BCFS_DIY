@@ -19,7 +19,7 @@ class Info(Hashable):
 
 
 class Block(Hashable):
-    def __init__(self, bh: Header, txs: Sequence[TX]):
+    def __init__(self, bh: Header, txs: Sequence[TX]) -> None:
         self.info: Info = Info(txs)
         self.header: Header = bh
         self.mt: MerkleTree = MerkleTree(txs)

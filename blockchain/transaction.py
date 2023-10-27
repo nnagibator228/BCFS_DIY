@@ -5,7 +5,7 @@ num = Union[int, float]
 
 
 class TX(Hashable):
-    def __init__(self, fr: Hash, to: Hash, value: num, fee: num, nonce: int):
+    def __init__(self, fr: Hash, to: Hash, value: num, fee: num, nonce: int) -> None:
         self.fr, self.to = fr, to
         self.value: float = float(value)
         self.fee: num     = fee

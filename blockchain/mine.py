@@ -26,7 +26,7 @@ class Miner:
         bh.nonce = nonce
         return Block(bh, txs)
 
-    def coinbase(self, reward):
+    def coinbase(self, reward) -> TX:
         return self.acc.sign(TX(self.pub, self.pub, reward, 0, self.acc.nonce))
 
 

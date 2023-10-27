@@ -1,27 +1,35 @@
 from hash import *
-from copy import deepcopy
+from typing import Union, Sequence
 
-class TX(Hashable): 
-    def __init__(self, fr, to, value, fee, nonce): 
+num = Union[int, float]
+
+
+class TX(Hashable):
+    def __init__(self, fr: Hash, to: Hash, value: num, fee: num, nonce: int):
         self.fr, self.to = fr, to
-        self.value       = float(value)
-        self.fee         = fee
-        self.nonce       = nonce
-        self.time        = time.ctime()
-        self.signed      = False
-        
-    def __setattr__(self, prop, val):
+        self.value: float = float(value)
+        self.fee: num     = fee
+        self.nonce: int   = nonce
+        self.time: str    = time.ctime()
+        self.signed: bool = False
+
+    def __setattr__(self, prop: Any, val: Any) -> None:
         super().__setattr__(prop, val)
-        if prop == 'sig': self.signed = True
-    
-    def smry(self): return f'{pmh(self.fr)} -> {pmh(self.to)} {self.value} eth'
+        if prop == 'sig':
+            self.signed = True
+
+    def smry(self) -> str:
+        return f'{mini_pretty_hash(self.fr)} -> {mini_pretty_hash(self.to)} {self.value} eth'
 
 
-def load_tx(d):
-    d = json.loads(d)
-    tx = TX(d['fr'],d['to'],d['value'],d['fee'],d['nonce'])
-    for k,v in d.items(): setattr(tx, k, v)
+def load_tx(json_tx: str) -> TX:
+    d = json.loads(json_tx)
+    tx = TX(d['fr'], d['to'], d['value'], d['fee'], d['nonce'])
+    for k, v in d:
+        setattr(tx, k, v)
     tx.hash = d['hash']
     return tx
 
-def txs2str(txs): return '\n'.join([str(tx)+'\n' for tx in txs])
+
+def txs2str(txs: Sequence[TX]) -> str:
+    return '\n'.join([str(tx) + '\n' for tx in txs])

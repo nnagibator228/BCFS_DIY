@@ -3,7 +3,7 @@ from mine import *
 
 class AccountState:
     def __init__(self) -> None:
-        self.balance: float = 0
+        self.balance: float = 100
         self.nonce: int = 0
 
     def inc_nonce(self) -> None:
@@ -72,37 +72,38 @@ class State:
 
 
 class Blockchain:
-    def __init__(self, gb: Block) -> None:
-        self.state: State = State()
-        self.blocks: List[Block] = []
+    def __init__(self, gb):
+        self.state  = State()
+        self.blocks = []
         self.state.init(gb)
         self.blocks.append(gb)
+        self.staged_txs = []
 
-    def candidate(self, txs: Sequence[TX]) -> Block:
-        mt: MerkleTree = MerkleTree(txs)
-        bh: Header = Header(mt.root, self.blocks[-1].hash, len(self.blocks), len(txs))
-        return Block(bh, txs)
+    def candidate(self):
+        mt = MerkleTree(self.staged_txs)
+        bh = Header(mt.root, self.blocks[-1].hash, len(self.blocks), len(txs))
+        return Block(bh, self.staged_txs)
 
-    def add(self, mb: Block) -> bool:
+    def add(self, mb):
         assert self.val(mb)
-        for tx in mb.txs.values():
-            assert self.state.apply(tx, mb.header.miner)
+        for tx in mb.txs.values(): assert self.state.apply(tx, mb.header.miner)
         self.state.apply_reward(mb.header.miner, mb.header.reward)
         self.blocks.append(mb)
+        self.staged_txs.clear()
         return True
 
-    def val(self, mb: Block) -> bool:
-        bh: Header = mb.header
+    def add(self, tx):
+        self.staged_txs.append(tx)
+
+    def val(self, mb):
+        bh = mb.header
         assert val_pow(mb)
         assert bh.number == len(self.blocks)
-        if len(self.blocks) > 0:
-            assert self.blocks[-1].hash == bh.prev_hash
+        if len(self.blocks) > 0: assert self.blocks[-1].hash == bh.prev_hash
         return True
 
-    def __getitem__(self, key: Hash) -> AccountState:
-        return self.state.__getitem__(key)
-
-    def __str__(self) -> str:
-        return (('\n' * 2 + '--' * 20 + '\n' * 2).join(f'{str(block)}' for block in self.blocks)
-                + '\n' * 2 + '-' * 6 + '\nstate:\n' + '-' * 6
-                + '\n' + str(self.state))
+    def __getitem__(self, key): return self.state.__getitem__(key)
+    def __str__(self):
+        return (('\n'*2+'--'*20+'\n'*2).join(f'{str(block)}' for block in self.blocks)
+                +'\n'*2+'-'*6+'\nstate:\n'+'-'*6
+                +'\n'+str(self.state))

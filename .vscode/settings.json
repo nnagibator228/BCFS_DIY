@@ -1,0 +1,9 @@
+{
+    "docify.commentService.programmingLanguage": "python",
+    "docify.commentService.docstringFormat": "Google",
+    "docify.commentService.autoTranslationService": "Russian",
+    "docify.translateService.targetLanguage": "Russian",
+    "docify.translateService.programmingLanguage": "python",
+    "docify.translateService.docstringFormat": "Google",
+    "docify.translateService.sourceLanguage": "Russian"
+}

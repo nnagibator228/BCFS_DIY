@@ -20,27 +20,35 @@ global acc_dict
 acc_dict = {}
 
 def create_acc(id: str):
-    if id not in acc_dict: acc_dict[id] = Wallet()
+    if int(id) not in acc_dict: acc_dict[int(id)] = Wallet()
+    return acc_dict[int(id)]
 
 def create_tx(id: str, to_pub: str, amount: int):
-    try: blockchain.add(acc_dict[id].signed_tx(to_pub, amount, 1)); return True
+    to_acc = None
+    for acc in acc_dict.values():
+        if acc.pub == to_pub: to_acc = acc
+    if not to_acc: return False
+    try: blockchain.add(acc_dict[int(id)].signed_tx(to_acc, float(amount), 0.5)); return True
     except AssertionError: return False
 
 def create_block():
-    if len(blockchain.staged_txs) > 0:
+    print(blockchain.staged_txs)
+    if len(blockchain.staged_txs) < 0:
         return False
     else:
-        try: return blockchain.add(blockchain.candidate())
+        try: 
+            mined = miner.mine(blockchain.staged_txs, blockchain.blocks[-1].header, 1, 2)
+            return blockchain.add_mb(mined)
         except AssertionError: return False
 
 def get_blocks():
-    return {'blocks': json.dumps([b.json() for b in blockchain.blocks])}
+    return {'blocks': [b.json() for b in blockchain.blocks]}
 
 def get_block(block_number: str):
     return blockchain.blocks[int(block_number)].json()
 
-def get_tx(block_number: str, tx_hash: str):
-    return {'tx': blockchain.blocks[int(block_number)][tx_hash].json()}
+def get_tx(block_number: int, tx_hash: str):
+    return blockchain.blocks[int(block_number)][tx_hash].json()
 
 def get_txs():
     txs = []
@@ -51,6 +59,10 @@ def get_txs():
 
 def get_account(acc_hash: str):
     return blockchain[acc_hash].json()
+
+def get_account_by_id(id:str):
+    if acc_dict[int(id)]: return blockchain[acc_dict[int(id)].pub].json()
+    else: return {}
 
 
 server = SimpleXMLRPCServer(("localhost", 8000))
@@ -64,6 +76,8 @@ server.register_function(get_block, "block")
 server.register_function(get_tx, "tx")
 server.register_function(get_txs, "txs")
 server.register_function(get_account, "acc")
+server.register_function(get_account_by_id, "acc_by_id")
+server.register_function(mini_pretty_hash, "pretty_hash")
 
 
 server.serve_forever()

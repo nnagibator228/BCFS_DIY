@@ -38,7 +38,7 @@ class Block(Hashable):
         h: Dict[str, Any] = self.header.__dict__
         json_txs: List[str] = [tx.json() for tx in self.txs.values()]
         d = {**info, **h, 'txs': json_txs}
-        return json.dumps(d, indent=4)
+        return d
 
     def are_unique(self, txs: Sequence[TX]) -> bool:
         return len(set([tx.hash for tx in txs])) == len(txs)

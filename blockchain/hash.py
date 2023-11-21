@@ -45,7 +45,7 @@ class Hashable:
         return self.hash.encode()
 
     def json(self) -> str:
-        return json.dumps({**self.__dict__}, indent=4)
+        return {**self.__dict__}
 
     def __setattr__(self, prop: Any, val: Any) -> None:
         super().__setattr__(prop, val)

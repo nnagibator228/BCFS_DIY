@@ -12,10 +12,10 @@ LocalAccount = NewType('LocalAccount', eth_account.account.LocalAccount)
 
 def keys() -> Tuple[str, Hash]:
     acc: LocalAccount = w3.create()
-    return acc.privateKey.hex(), acc.address
+    return acc._private_key.hex(), acc.address
 
 
-class Wallet:
+class Wallet(Hashable):
     def __init__(self) -> None:
         self.priv, self.pub = keys()
         self.nonce: int = 0

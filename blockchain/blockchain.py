@@ -16,7 +16,7 @@ class AccountState:
         self.balance -= value
 
     def json(self) -> str:
-        return json.dumps(self.__dict__)
+        return self.__dict__
 
     def __str__(self) -> str:
         return f'balance: {self.balance}\nnonce: {self.nonce}'
@@ -81,10 +81,10 @@ class Blockchain:
 
     def candidate(self):
         mt = MerkleTree(self.staged_txs)
-        bh = Header(mt.root, self.blocks[-1].hash, len(self.blocks), len(txs))
+        bh = Header(mt.root, self.blocks[-1].hash, len(self.blocks), len(self.staged_txs))
         return Block(bh, self.staged_txs)
 
-    def add(self, mb):
+    def add_mb(self, mb):
         assert self.val(mb)
         for tx in mb.txs.values(): assert self.state.apply(tx, mb.header.miner)
         self.state.apply_reward(mb.header.miner, mb.header.reward)

@@ -9,8 +9,28 @@ bot_token = str(os.environ.get("BOT_TOKEN"))
 bot = telebot.TeleBot(bot_token)
 client = xmlrpc.client.ServerProxy(f"http://{host}:8000")
 
+faq = "ℹ️ *FAQ*: \n" \
+"  - Available commands: \n" \
+"    `/help` - get bot's faq \n" \
+"    `/start` - initialize ur wallet & assigns it to ur telegram id \n" \
+"    __By default u get 100 of currency. Please, do not overcome limit. There's also fee payment, that would be taken from ur accoune (2 currency) __ \n" \
+"    **Pattern `/view`:** \n" \
+"    `/view blocks` - to view all current blocks in BC \n" \
+"    `/view block <block number>` - to view specific block by its number \n" \
+"    `/view txs` - to view all current txs in BC \n" \
+"    `/view tx <block number> <tx hash>` - to view specific tx in block by its hash \n" \
+"    `/view balance` - to view ur own balance \n" \
+"    `/view balance <acc hash>` - to view ur own balance \n" \
+"    __To view acc's balance u must first create a tx from/to it & then tx should be added to created block. This incovinience is folowed during blockchain arch limitation__ \n" \
+"    __To view someone's else balance u must first get his acc hash, provided when calling /start Its also used for sending txs__ \n" \
+"    **Pattern `/create`:** \n" \
+"    `/create tx <reciever's hash> <amount>` - creates a transaction with given creds & adds it to buffer \n" \
+"    __Note that tx should only point to another adress (do not try to send tx to urself!) to prevent bot crashes. This incovinience is folowed during blockchain arch limitation__ \n" \
+"    `/create block` - creates block with txs from buffer"
+
+
 def parse_block(data):
-    beautified_string = "🕋 *Block*: \n" \
+    beautified_string = "🕋 **Block**: \n" \
                         "Hash: `{}` \n" \
                         "Volume: `{}` \n" \
                         "Fees: `{}` \n" \
@@ -39,7 +59,7 @@ def parse_block(data):
 
 
 def parse_blocks(data):
-    beautified_string = "🕋🕋 *Blocks:* \n \n"
+    beautified_string = "🕋🕋 **Blocks:** \n \n"
     for block in data['blocks']:
         beautified_string += parse_block(block)
 
@@ -47,7 +67,7 @@ def parse_blocks(data):
 
 
 def parse_tx(data):
-    beautified_string = " 💸 *Transaction* \n" \
+    beautified_string = " 💸 **Transaction** \n" \
                              "   - Hash: `{}` \n" \
                              "     From: `{}` \n" \
                              "     To: `{}` \n" \
@@ -96,6 +116,11 @@ def start(message):
     user_id = message.chat.id
     acc = client.add_acc(str(user_id))
     bot.send_message(chat_id=user_id, text=f"Hello, `{client.pretty_hash(acc['pub'])}`! Welcome to *Blockchain From Scratch* client bot! Your wallet hash is `{str(acc['pub'])}`", parse_mode="Markdown")
+
+@bot.message_handler(commands=['help'])
+def start(message):
+    user_id = message.chat.id
+    bot.send_message(chat_id=user_id, text=faq, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=['view'])

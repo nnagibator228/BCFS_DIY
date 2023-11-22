@@ -32,7 +32,6 @@ def create_tx(id: str, to_pub: str, amount: int):
     except AssertionError: return False
 
 def create_block():
-    print(blockchain.staged_txs)
     if len(blockchain.staged_txs) < 0:
         return False
     else:

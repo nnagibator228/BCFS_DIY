@@ -1,13 +1,16 @@
 import os
-import json
+import logging
 import xmlrpc.client
 import telebot
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+port = str(os.environ.get("RPC_SERVER_PORT"))
 host = str(os.environ.get("RPC_SERVER_HOST"))
-bot_token = str(os.environ.get("BOT_TOKEN"))
+bot_token = str(os.environ.get("TELEGRAM_BOT_TOKEN"))
 
 bot = telebot.TeleBot(bot_token)
-client = xmlrpc.client.ServerProxy(f"http://{host}:8000")
+client = xmlrpc.client.ServerProxy(f"http://{host}:{port}")
 
 faq = "ℹ️ *FAQ*: \n" \
 "  - Available commands: \n" \
@@ -107,7 +110,7 @@ def parse_add_tx(data):
 def try_to_call(method, user_id, parse_method, *args):
     if all(arg is not None for arg in args):
         try: bot.send_message(chat_id=user_id, text=parse_method(getattr(client, method)(*args)), parse_mode="Markdown")
-        except Exception as e: print(e); bot.send_message(chat_id=user_id, text="Something went wrong. Recheck arguments provided. See more: /help"); return None
+        except Exception as e: logger.warning(e); bot.send_message(chat_id=user_id, text="Something went wrong. Recheck arguments provided. See more: /help"); return None
     else: bot.send_message(chat_id=user_id, text="Not all arguments fullfilled. See more: /help")
 
 
@@ -164,5 +167,5 @@ def view(message):
             bot.send_message(chat_id=user_id, text="Invalid command. Please use '/create block \ tx '. See more: /help")
 
 
-print("Starting bot... ")
+logger.info("Starting bot... ")
 bot.polling()

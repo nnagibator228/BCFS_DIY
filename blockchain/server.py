@@ -5,7 +5,13 @@ from mine import *
 from wallet import *
 from wallet import *
 from xmlrpc.server import SimpleXMLRPCServer
+import os
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+port = int(os.environ.get("RPC_SERVER_PORT"))
 test_w1 = Wallet()
 test_w2 = Wallet()
 miner = Miner(test_w2)
@@ -64,8 +70,8 @@ def get_account_by_id(id:str):
     else: return {}
 
 
-server = SimpleXMLRPCServer(("localhost", 8000))
-print("Starting XML-RPC server on localhost:8000")
+server = SimpleXMLRPCServer(("0.0.0.0", port))
+logger.info(f"Starting XML-RPC server on localhost:{port}")
 
 server.register_function(create_acc, "add_acc")
 server.register_function(create_tx, "add_tx")

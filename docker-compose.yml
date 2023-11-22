@@ -1,0 +1,34 @@
+version: '3'
+services:
+  blockchain-server:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    image: local-blockchain:latest
+    hostname: blockchain
+    container_name: blockchain
+    ports:
+      - ${RPC_SERVER_PORT}:${RPC_SERVER_PORT}
+    environment:
+      - RPC_SERVER_PORT=${RPC_SERVER_PORT}
+    volumes:
+      - ./blockchain:/app
+    networks:
+      - bc-network
+
+  telegram-bot:
+    build:
+      context: ./telegram
+      dockerfile: Dockerfile
+    image: local-telegrambot:latest
+    hostname: telegrambot
+    container_name: telegrambot
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - RPC_SERVER_PORT=${RPC_SERVER_PORT}
+      - RPC_SERVER_HOST=blockchain
+    networks:
+      - bc-network
+
+networks:
+  bc-network:
